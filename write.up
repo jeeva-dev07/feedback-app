@@ -1,0 +1,86 @@
+# Task 13 – Custom Hooks: useForm + useToast
+## 1. What is a custom hook? Why must its name start with "use"?
+A custom hook is a reusable JavaScript function that contains React Hook logic.
+It allows developers to share common functionality between multiple components without duplicating code.
+In this project, I created two custom hooks:
+* useForm – Handles form state, validation, and form reset functionality.
+* useToast – Handles toast notifications.
+A custom hook must start with "use" because React uses this naming convention to identify hooks and enforce the Rules of Hooks. Naming it with "use" ensures React can properly track hook behavior and state management.
+## 2. Paste your useForm hook code. How does one hook handle validation for multiple different fields?
+### useForm Hook
+
+```javascript
+import { useState } from "react";
+
+export function useForm(initialValues, validate) {
+  const [values, setValues] = useState(initialValues);
+  const [errors, setErrors] = useState({});
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+
+    setValues((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
+  function validateForm() {
+    const newErrors = validate(values);
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  }
+
+  function resetForm() {
+    setValues(initialValues);
+    setErrors({});
+  }
+
+  return {
+    values,
+    errors,
+    handleChange,
+    validateForm,
+    resetForm,
+  };
+}
+```
+### How does it handle multiple fields?
+The hook accepts two parameters:
+```javascript
+useForm(initialValues, validate)
+```
+* initialValues contains the form fields.
+* validate is a custom validation function.
+
+The hook does not know anything about specific fields.
+It simply stores values and executes the validation function passed to it.
+Because different forms can provide different initialValues and validation logic,
+the same hook can be reused for Login, Register, Product, Checkout, and Feedback forms.
+## 3. How does your toast message disappear automatically after 3 seconds? Show the exact code responsible for that.
+The toast notification uses setTimeout().
+```javascript
+setTimeout(() => {
+  setToasts((prev) =>
+    prev.filter((toast) => toast.id !== id)
+  );
+}, 3000);
+```Explanation:
+* When a toast is created, it is added to the toasts state array.
+* setTimeout() starts a timer for 3000 milliseconds (3 seconds).
+* After 3 seconds, the toast is removed from the array.
+* Since React re-renders the component, the toast disappears from the screen automatically.
+## 4. Why is a toast notification better UX than alert() for the user?
+Toast notifications provide a better user experience because:
+* They do not block the application.
+* Users can continue interacting with the page.
+* They look more professional and modern.
+* They disappear automatically after a short time.
+* They provide feedback without interrupting the workflow.
+In contrast, alert() blocks the screen and requires the user to manually close the popup before continuing.
+## Conclusion
+In this task, I implemented two reusable custom hooks:
+* useForm for form state management and validation.
+* useToast for displaying success and error notifications.
+The Feedback App uses these hooks to validate user input, show inline errors, display toast notifications, and add feedback entries dynamically without using alert().
